@@ -14,10 +14,17 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    if ($request->expectsJson()) {
-        return response()->json(['message' => "Welcome", "data" => $request->user()], 200);
-    }
-    return "Hello World!";
-    // return $request->user();
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::get('/user', function (Request $request) {
+        if ($request->expectsJson()) {
+            return response()->json(['message' => "Welcome", "data" => $request->user()], 200);
+        }
+        return $request->user();
+    });
+    Route::get("/admin", function () {
+        return "Hello Admin!";
+    })->middleware('role_or_permission:admin|admin dashboard');
+    Route::get("/user/dashboard", function () {
+        return "Hello User!";
+    })->middleware('role_or_permission:user|user dashboard');
 });
