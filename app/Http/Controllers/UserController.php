@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Helper;
-use App\Models\Category;
+use App\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class CategoryController extends Controller
+class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,7 +17,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        return Helper::jsonData(Category::paginate());
+        return Helper::jsonData(User::with('roles')->paginate());
     }
 
     /**
@@ -29,8 +29,10 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => ['required', 'unique:categories'],
-            'details' => ['required']
+            'name' => ['required', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users'],
+            'role' => ['required', 'exists:roles,name'],
+            'password' => ['required', 'min:8', 'confirmed'],
         ]);
 
         if ($validator->fails()) {
@@ -38,8 +40,9 @@ class CategoryController extends Controller
         }
 
         try {
-            $category = Category::create($request->all());
-            return Helper::jsonData($category, 201);
+            $user = User::create($request->except('role'));
+            $user->assignRole($request->role);
+            return Helper::jsonData($user, 201);
         } catch (QueryException $e) {
             return Helper::errorJson();
         }
@@ -54,8 +57,8 @@ class CategoryController extends Controller
     public function show($id)
     {
         try {
-            $category = Category::findOrFail($id);
-            return Helper::jsonData($category);
+            $user = User::with('roles')->findOrFail($id);
+            return Helper::jsonData($user);
         } catch (QueryException $e) {
             return Helper::jsonNotFound();
         }
@@ -70,19 +73,27 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => ['required', 'unique:categories,name,' . $id],
-            'details' => ['required']
-        ]);
+        $rules = [
+            'name' => ['required'],
+            'email' => ['required', 'unique:users,email,' . $id],
+            'role' => ['required', 'exits:roles,name']
+        ];
+
+        if ($request->password) {
+            $rules['password'] = ['confirmed', 'min:8'];
+        }
+
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return Helper::jsonValidation($validator);
         }
 
         try {
-            $category = Category::findOrFail($id);
-            $category->update($request->all());
-            return Helper::jsonData($category);
+            $user = User::with('roles')->findOrFail($id);
+            $user->update($request->except('role', 'password_confirmation'));
+            $user->syncRoles($request->role);
+            return Helper::jsonData($user);
         } catch (QueryException $e) {
             return Helper::jsonNotFound();
         }
@@ -97,9 +108,9 @@ class CategoryController extends Controller
     public function destroy($id)
     {
         try {
-            $category = Category::findOrFail($id);
-            $category->delete();
-            return Helper::jsonData($category);
+            $user = User::findOrFail($id);
+            $user->delete();
+            return Helper::jsonData($user);
         } catch (QueryException $e) {
             return Helper::jsonNotFound();
         }

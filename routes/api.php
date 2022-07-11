@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -37,4 +38,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::put('/blogs/{id}', 'update')->middleware('permission:update blog');
         Route::delete('/blogs/{id}', 'destroy')->middleware('permission:delete blog');
     });
+
+    Route::get('/users', [UserController::class, 'index'])->middleware('permission:read users|manage users');
+    Route::apiResource('/users', UserController::class)->except('index')->middleware('permission:manage users');
 });

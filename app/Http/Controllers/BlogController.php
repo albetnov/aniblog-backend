@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Helpers\Helper;
+use App\Helpers\Helper;
 use App\Models\Blog;
 use App\Models\Category;
 use Illuminate\Database\QueryException;
@@ -75,7 +75,7 @@ class BlogController extends Controller
     public function show($id)
     {
         try {
-            $blog = Blog::findOrFail($id);
+            $blog = Blog::with('categories')->findOrFail($id);
             return response()->json($blog, 200);
         } catch (QueryException $e) {
             Helper::jsonNotFound();
