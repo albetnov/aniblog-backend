@@ -24,7 +24,8 @@ return [
         'forgot-password',
         'reset-password',
         'user/profile-information',
-        'email/verification-notification'
+        'email/verification-notification',
+        'logout'
     ],
 
     'allowed_methods' => ['*'],

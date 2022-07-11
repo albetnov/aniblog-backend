@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\BlogController;
+use App\Http\Controllers\CategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,10 +23,18 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         }
         return $request->user();
     });
-    Route::get("/admin", function () {
-        return "Hello Admin!";
-    })->middleware('role_or_permission:admin|admin dashboard');
-    Route::get("/user/dashboard", function () {
-        return "Hello User!";
-    })->middleware('role_or_permission:user|user dashboard');
+    Route::controller(CategoryController::class)->group(function () {
+        Route::get('/categories', 'index')->middleware('permission:read category');
+        Route::get('/categories/{id}', 'show')->middleware('permission:read category');
+        Route::post('/categories', 'store')->middleware('permission:create category');
+        Route::put('/categories/{id}', 'update')->middleware('permission:update category');
+        Route::delete('/categories/{id}', 'destroy')->middleware('permission:delete category');
+    });
+    Route::controller(BlogController::class)->group(function () {
+        Route::get('/blogs', 'index')->middleware('permission:read blog');
+        Route::get("/blogs/{id}", 'show')->middleware('permission:read blog');
+        Route::post('/blogs', 'store')->middleware('permission:create blog');
+        Route::put('/blogs/{id}', 'update')->middleware('permission:update blog');
+        Route::delete('/blogs/{id}', 'destroy')->middleware('permission:delete blog');
+    });
 });
