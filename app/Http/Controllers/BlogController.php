@@ -19,7 +19,7 @@ class BlogController extends Controller
      */
     public function index()
     {
-        return Helper::jsonData(Blog::with('categories')->paginate());
+        return Helper::jsonData(Blog::with('categories')->orderByDesc('id')->paginate());
     }
 
     /**
@@ -48,14 +48,7 @@ class BlogController extends Controller
                     'content' => $request->content,
                     'posted_by' => $request->user()->id
                 ]);
-                $categories = [];
-                if (str_contains($request->categories, ',')) {
-                    foreach (explode(',', $request->categories) as $category) {
-                        $categories[] = $category;
-                    }
-                } else {
-                    $categories = $request->categories;
-                }
+                $categories = Helper::parseArrayString($request->categories);
                 Category::findOrFail($categories)->each(function ($category) use ($blog) {
                     $blog->categories()->attach($category);
                 });
@@ -94,7 +87,7 @@ class BlogController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => ['required'],
             'content' => ['required'],
-            'categories' => ['required', 'regex:[,]']
+            'categories' => ['required']
         ]);
 
         if ($validator->fails()) {
@@ -107,14 +100,7 @@ class BlogController extends Controller
             DB::transaction(function () use ($request, $id) {
                 $blog = Blog::findOrFail($id);
                 $blog->update($request->except('categories'));
-                $categories = [];
-                if (str_contains($request->categories, ',')) {
-                    foreach (explode(',', $request->categories) as $category) {
-                        $categories[] = $category;
-                    }
-                } else {
-                    $categories = $request->categories;
-                }
+                $categories = Helper::parseArrayString($request->categories);
                 $blog->categories()->sync($categories);
                 return Helper::jsonData($blog);
             });

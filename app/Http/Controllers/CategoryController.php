@@ -17,7 +17,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        return Helper::jsonData(Category::paginate());
+        return Helper::jsonData(Category::orderByDesc('id')->paginate());
     }
 
     /**

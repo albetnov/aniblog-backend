@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -41,4 +43,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::get('/users', [UserController::class, 'index'])->middleware('permission:read users|manage users');
     Route::apiResource('/users', UserController::class)->except('index')->middleware('permission:manage users');
+    Route::apiResource('/roles', RoleController::class)->middleware('permission: manage roles');
+    Route::get('/permissions', [PermissionController::class, 'index'])->middleware('permission: manage roles');
 });

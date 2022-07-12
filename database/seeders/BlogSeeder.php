@@ -2,20 +2,20 @@
 
 namespace Database\Seeders;
 
+use App\Models\Blog;
+use App\Models\Category;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class DatabaseSeeder extends Seeder
+class BlogSeeder extends Seeder
 {
     /**
-     * Seed the application's database.
+     * Run the database seeds.
      *
      * @return void
      */
     public function run()
     {
-        $this->call(RoleSeeder::class);
-        $this->call(UserSeeder::class);
-        $this->call(BlogSeeder::class);
+        Blog::factory(20)->has(Category::factory()->count(3))->create();
     }
 }

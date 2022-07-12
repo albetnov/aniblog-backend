@@ -23,4 +23,17 @@ class Helper
     {
         return response()->json($validation->errors(), 422);
     }
+
+    public static function parseArrayString($string)
+    {
+        $result = [];
+        if (str_contains($string, ',')) {
+            foreach (explode(',', $string) as $category) {
+                $result[] = $category;
+            }
+        } else {
+            $result = $string;
+        }
+        return $result;
+    }
 }
