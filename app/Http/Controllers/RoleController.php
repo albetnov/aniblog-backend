@@ -7,6 +7,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Str;
 
 class RoleController extends Controller
 {
@@ -17,7 +18,7 @@ class RoleController extends Controller
      */
     public function index()
     {
-        return Helper::jsonData(Role::orderByDesc('id')->paginate());
+        return Helper::jsonData(Role::with('permissions')->orderByDesc('id')->paginate());
     }
 
     /**
@@ -29,7 +30,7 @@ class RoleController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => ['required', 'unique:roles,name', 'regex:/^\S*$/u'],
+            'name' => ['required', 'regex:/^\S*$/u', 'unique:roles,name'],
             'permissions' => ['required']
         ]);
 
@@ -38,7 +39,7 @@ class RoleController extends Controller
         }
 
         try {
-            $role = Role::create($request->name);
+            $role = Role::create(['name' => Str::lower($request->name), 'guard_name' => 'web']);
             $permissions = Helper::parseArrayString($request->permissions);
             $role->syncPermissions($permissions);
             return Helper::jsonData($role, 201);
@@ -73,7 +74,7 @@ class RoleController extends Controller
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'name' => ['required', 'unique:roles,name,' . $id, 'regex:/^\S*$/u'],
+            'name' => ['required', 'regex:/^\S*$/u', 'unique:roles,name,' . $id],
             'permissions' => ['required']
         ]);
 
@@ -83,7 +84,7 @@ class RoleController extends Controller
 
         try {
             $role = Role::findOrFail($id);
-            $role->update($request->name);
+            $role->update(['name' => Str::lower($request->name)]);
             $permissions = Helper::parseArrayString($request->permissions);
             $role->syncPermissions($permissions);
             return Helper::jsonData($role);

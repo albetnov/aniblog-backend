@@ -40,7 +40,11 @@ class UserController extends Controller
         }
 
         try {
-            $user = User::create($request->except('role'));
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => bcrypt($request->password),
+            ]);
             $user->assignRole($request->role);
             return Helper::jsonData($user, 201);
         } catch (QueryException $e) {
@@ -79,8 +83,11 @@ class UserController extends Controller
             'role' => ['required', 'exists:roles,name']
         ];
 
+        $data = [];
+
         if ($request->password) {
             $rules['password'] = ['confirmed', 'min:8'];
+            $data['password'] = bcrypt($request->password);
         }
 
         $validator = Validator::make($request->all(), $rules);
@@ -91,7 +98,9 @@ class UserController extends Controller
 
         try {
             $user = User::with('roles')->findOrFail($id);
-            $user->update($request->except('role', 'password_confirmation'));
+            $data['email'] = $request->email;
+            $data['name'] = $request->name;
+            $user->update($data);
             $user->syncRoles($request->role);
             return Helper::jsonData($user);
         } catch (QueryException $e) {

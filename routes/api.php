@@ -26,6 +26,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         }
         return $request->user();
     });
+
     Route::controller(CategoryController::class)->group(function () {
         Route::get('/categories', 'index')->middleware('permission:read category');
         Route::get('/categories/{id}', 'show')->middleware('permission:read category');
@@ -33,6 +34,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::put('/categories/{id}', 'update')->middleware('permission:update category');
         Route::delete('/categories/{id}', 'destroy')->middleware('permission:delete category');
     });
+
     Route::controller(BlogController::class)->group(function () {
         Route::get('/blogs', 'index')->middleware('permission:read blog');
         Route::get("/blogs/{id}", 'show')->middleware('permission:read blog');
@@ -43,6 +45,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::get('/users', [UserController::class, 'index'])->middleware('permission:read users|manage users');
     Route::apiResource('/users', UserController::class)->except('index')->middleware('permission:manage users');
-    Route::apiResource('/roles', RoleController::class)->middleware('permission: manage roles');
-    Route::get('/permissions', [PermissionController::class, 'index'])->middleware('permission: manage roles');
+    Route::apiResource('/roles', RoleController::class)->middleware('permission:manage roles');
+    Route::get('/permissions', [PermissionController::class, 'index'])->middleware('permission:manage roles');
 });
