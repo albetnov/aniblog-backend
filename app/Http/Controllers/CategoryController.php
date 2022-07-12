@@ -98,10 +98,15 @@ class CategoryController extends Controller
     {
         try {
             $category = Category::findOrFail($id);
+        } catch (QueryException $e) {
+            return Helper::jsonNotFound();
+        }
+
+        try {
             $category->delete();
             return Helper::jsonData($category);
         } catch (QueryException $e) {
-            return Helper::jsonNotFound();
+            return Helper::jsonData(['message' => 'Resource in use'], 500);
         }
     }
 }
