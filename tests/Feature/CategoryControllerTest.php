@@ -8,7 +8,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Feature\Base\Setup;
 
 use function Pest\Laravel\seed;
-use function Pest\Laravel\withHeader;
 
 uses(RefreshDatabase::class);
 
@@ -65,7 +64,7 @@ it("should update the category", function () {
     $this->putJson("/api/categories/{$category}", [
         'name' => 'example category updated',
         'details' => 'this is a example category updated.'
-    ])->assertStatus(200)->assertJson(
+    ])->assertOk()->assertJson(
         fn (AssertableJson $json) =>
         $json->has('name')->has('details')->etc()
     );
@@ -81,7 +80,7 @@ it("should failed update category (Not found)", function () {
 
 it("should delete a category", function () {
     $category = Category::inRandomOrder()->first()->id;
-    $this->delete("/api/categories/{$category}")->assertStatus(200)->assertJson(
+    $this->delete("/api/categories/{$category}")->assertOk()->assertJson(
         fn (AssertableJson $json) =>
         $json->has('name')->has('details')->etc()
     );

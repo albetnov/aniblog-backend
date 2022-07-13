@@ -42,8 +42,8 @@ class BlogController extends Controller
         }
 
         try {
-            DB::transaction(function () use ($request) {
-                $blog = Blog::create([
+            return DB::transaction(function () use ($request) {
+                $blog = Blog::with('categories')->create([
                     'title' => $request->title,
                     'content' => $request->content,
                     'posted_by' => $request->user()->id
@@ -55,7 +55,7 @@ class BlogController extends Controller
                 return Helper::jsonData($blog, 201);
             });
         } catch (QueryException $e) {
-            Helper::errorJson();
+            return Helper::errorJson();
         }
     }
 
@@ -69,9 +69,9 @@ class BlogController extends Controller
     {
         try {
             $blog = Blog::with('categories')->findOrFail($id);
-            return response()->json($blog, 200);
+            return Helper::jsonData($blog);
         } catch (QueryException $e) {
-            Helper::jsonNotFound();
+            return Helper::jsonNotFound();
         }
     }
 
@@ -97,8 +97,8 @@ class BlogController extends Controller
         $request->posted_by = $request->user()->id;
 
         try {
-            DB::transaction(function () use ($request, $id) {
-                $blog = Blog::findOrFail($id);
+            return DB::transaction(function () use ($request, $id) {
+                $blog = Blog::with('categories')->findOrFail($id);
                 $blog->update($request->except('categories'));
                 $categories = Helper::parseArrayString($request->categories);
                 $blog->categories()->sync($categories);
@@ -118,7 +118,7 @@ class BlogController extends Controller
     public function destroy($id)
     {
         try {
-            $blog = Blog::findOrFail($id);
+            $blog = Blog::with('categories')->findOrFail($id);
             $blog->delete();
             return Helper::jsonData($blog);
         } catch (QueryException $e) {
