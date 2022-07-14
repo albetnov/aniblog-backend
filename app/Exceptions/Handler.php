@@ -47,8 +47,6 @@ class Handler extends ExceptionHandler
             if (app()->bound('sentry')) {
                 app('sentry')->captureException($e);
             }
-
-            parent::report($e);
         });
     }
 }
