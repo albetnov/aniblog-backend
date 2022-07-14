@@ -22,7 +22,7 @@ it("show a single user", function () {
 
 it("failed show single user (not found)", function () {
     $noUser = User::orderByDesc('id')->first()->id + 999;
-    $this->get("/api/users/{$noUser}")->assertStatus(404);
+    $this->get("/api/users/{$noUser}")->assertNotFound();
 });
 
 it("save a new user", function () {
@@ -37,7 +37,7 @@ it("save a new user", function () {
         'password' => "test123456798",
         'password_confirmation' => "test123456798",
         'role' => 'user'
-    ])->assertStatus(201)->assertJson((fn (AssertableJson $json) => $json->where('email', $data['email'])->where('name', $data['name'])->etc()));
+    ])->assertCreated()->assertJson((fn (AssertableJson $json) => $json->where('email', $data['email'])->where('name', $data['name'])->etc()));
 });
 
 it("failed save a new user (password mismatch)", function () {
@@ -47,7 +47,7 @@ it("failed save a new user (password mismatch)", function () {
         'password' => "test1234567",
         'password_confirmation' => "test123456798",
         'role' => 'user'
-    ])->assertStatus(422);
+    ])->assertUnprocessable();
 });
 
 it("failed save a new user (role not exist)", function () {
@@ -57,7 +57,7 @@ it("failed save a new user (role not exist)", function () {
         'password' => "test123456798",
         'password_confirmation' => "test123456798",
         'role' => 'usersssssssssssssssss'
-    ])->assertStatus(422);
+    ])->assertUnprocessable();
 });
 
 it("update a user without password", function () {
@@ -106,7 +106,7 @@ it("failed update a user with password (mismatch)", function () {
         'password' => "test123456798",
         'password_confirmation' => "test123456",
         'role' => 'user'
-    ])->assertStatus(422);
+    ])->assertUnprocessable();
 });
 
 it("failed update a user (no such user)", function () {
@@ -117,7 +117,7 @@ it("failed update a user (no such user)", function () {
         'password' => "test123456798",
         'password_confirmation' => "test123456798",
         'role' => 'user'
-    ])->assertStatus(404);
+    ])->assertNotFound();
 });
 
 it("failed update a user (no such role)", function () {
@@ -128,7 +128,7 @@ it("failed update a user (no such role)", function () {
         'password' => "test123456798",
         'password_confirmation' => "test123456798",
         'role' => 'userssssssssssssssssssss'
-    ])->assertStatus(422);
+    ])->assertUnprocessable();
 });
 
 it("delete a user", function () {
@@ -138,5 +138,5 @@ it("delete a user", function () {
 
 it("failed delete a user (no such user)", function () {
     $noUser = User::orderByDesc('id')->first()->id + 999;
-    $this->delete("/api/users/{$noUser}")->assertStatus(404);
+    $this->delete("/api/users/{$noUser}")->assertNotFound();
 });

@@ -30,7 +30,7 @@ it("show single blog (success)", function () {
 
 it("not showing single blog (not found)", function () {
     $noBlog = Blog::orderByDesc('id')->first()->id + 999;
-    $this->get("/api/blogs/{$noBlog}")->assertStatus(404);
+    $this->get("/api/blogs/{$noBlog}")->assertNotFound();
 });
 
 it("save a new blog", function () {
@@ -39,7 +39,7 @@ it("save a new blog", function () {
         'title' => 'This is a new blog',
         'content' => 'This is a new blog dude.',
         'categories' => $category
-    ])->assertStatus(201)->assertJson(fn (AssertableJson $json) => $json->has('title')->has('content')->etc())->json()['id'];
+    ])->assertCreated()->assertJson(fn (AssertableJson $json) => $json->has('title')->has('content')->etc())->json()['id'];
 
     $this->get("/api/blogs/{$blog}")->assertOk()->assertJson(fn (AssertableJson $json) => $json->has('categories')->etc());
 });
@@ -50,7 +50,7 @@ it("save a new blog failed (no such category)", function () {
         'title' => 'This is a new blog',
         'content' => 'This is a new blog content',
         'categories' => $category
-    ])->assertStatus(404);
+    ])->assertNotFound();
 });
 
 it("update the blog", function () {
@@ -80,7 +80,7 @@ it("failed update the blog (no such category)", function () {
         'title' => $json['title'],
         'content' => $json['content'],
         'categories' => $category
-    ])->assertStatus(404);
+    ])->assertNotFound();
 });
 
 it("failed update the blog (not found)", function () {
@@ -89,7 +89,7 @@ it("failed update the blog (not found)", function () {
         'title' => 'Blog',
         'content' => 'Blog content',
         'categories' => '1,2,3'
-    ])->assertStatus(404);
+    ])->assertNotFound();
 });
 
 it("delete a blog", function () {
@@ -99,5 +99,5 @@ it("delete a blog", function () {
 
 it("failed delete a blog (no such blog)", function () {
     $noBlog = Blog::inRandomOrder()->first()->id + 999;
-    $this->delete("/api/blogs/{$noBlog}")->assertStatus(404);
+    $this->delete("/api/blogs/{$noBlog}")->assertNotFound();
 });

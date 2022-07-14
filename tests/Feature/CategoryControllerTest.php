@@ -33,14 +33,14 @@ it('should return single category (success)', function () {
 
 it('should not return a category. (not found)', function () {
     $noCategory = Category::orderByDesc('id')->first()->id + 999;
-    $this->get("/api/categories/{$noCategory}")->assertStatus(404);
+    $this->get("/api/categories/{$noCategory}")->assertNotFound();
 });
 
 it('should save a new category', function () {
     $this->postJson('/api/categories', [
         'name' => 'example category',
         'details' => 'this is a example category.'
-    ])->assertStatus(201)->assertJson(
+    ])->assertCreated()->assertJson(
         fn (AssertableJson $json) =>
         $json->has('name')->has('details')->etc()
     );
@@ -51,12 +51,12 @@ it("should failed save a new category (Duplicate)", function () {
         'name' => 'example category duplicate',
         'details' => 'this is a example category duplicate.'
     ];
-    $this->postJson('/api/categories', $jsonContent)->assertStatus(201)->assertJson(
+    $this->postJson('/api/categories', $jsonContent)->assertCreated()->assertJson(
         fn (AssertableJson $json) =>
         $json->has('name')->has('details')->etc()
     );
 
-    $this->postJson('/api/categories', $jsonContent)->assertStatus(422);
+    $this->postJson('/api/categories', $jsonContent)->assertUnprocessable();
 });
 
 it("should update the category", function () {
@@ -75,7 +75,7 @@ it("should failed update category (Not found)", function () {
     $this->putJson("/api/categories/{$noCategory}", [
         'name' => 'example category updated',
         'details' => 'this is a example category updated.'
-    ])->assertStatus(404);
+    ])->assertNotFound();
 });
 
 it("should delete a category", function () {
@@ -88,7 +88,7 @@ it("should delete a category", function () {
 
 it("should not delete a category (not found)", function () {
     $noCategory = Category::orderByDesc('id')->first()->id + 999;
-    $this->delete("/api/categories/{$noCategory}")->assertStatus(404);
+    $this->delete("/api/categories/{$noCategory}")->assertNotFound();
 });
 
 it("should not delete a category (in use)", function () {

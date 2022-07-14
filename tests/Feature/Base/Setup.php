@@ -8,6 +8,7 @@ use Database\Seeders\RoleSeeder;
 use Database\Seeders\UserSeeder;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use Laravel\Sanctum\Sanctum;
+use Spatie\Permission\Models\Permission;
 
 use function Pest\Laravel\seed;
 use function Pest\Laravel\withoutExceptionHandling;
@@ -44,6 +45,25 @@ class Setup
 
         foreach ($categories as $category) {
             $lists .= "{$category->id},";
+        }
+
+        return rtrim($lists, ",");
+    }
+
+    public static function permissionBuilder($makeNotFound = false)
+    {
+        if ($makeNotFound) {
+            $noPermission = Permission::orderByDesc('id')->first()->id + 999;
+            $random = rand($noPermission, 9999);
+            return "{$noPermission},{$random},{$random}";
+        }
+
+        $permissions = Permission::inRandomOrder()->limit(2)->get();
+
+        $lists = "";
+
+        foreach ($permissions as $permission) {
+            $lists .= "{$permission->id},";
         }
 
         return rtrim($lists, ",");
