@@ -13,9 +13,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+if (config('app.env') !== "production") {
+    Route::view('/', 'index');
+} else {
+    Route::get('/', function () {
+        header('Content-Type: application/json');
+        echo json_encode(['message' => 'Welcome to AniBlog Backend endpoint.']);
+        exit;
+    });
+}
 
 Route::get("/password-reset", function () {
     echo "This is password reset!";
