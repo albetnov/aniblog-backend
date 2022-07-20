@@ -61,7 +61,7 @@ return [
     |
     */
 
-    'home' => env('SPA_URL') . '/dashboard',
+    'home' => config('spa.base_url') . config('spa.authenticated_endpoint'),
 
     /*
     |--------------------------------------------------------------------------

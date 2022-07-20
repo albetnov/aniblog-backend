@@ -140,3 +140,7 @@ it("failed delete a user (no such user)", function () {
     $noUser = User::orderByDesc('id')->first()->id + 999;
     $this->delete("/api/users/{$noUser}")->assertNotFound();
 });
+
+it("delete current user (logged in)", function () {
+    $this->delete("/api/user")->assertOk()->assertJson(fn (AssertableJson $json) => $json->has('name')->has('email')->etc());
+});

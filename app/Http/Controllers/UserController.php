@@ -124,4 +124,17 @@ class UserController extends Controller
             return Helper::jsonNotFound();
         }
     }
+
+    public function deleteSelf(Request $request)
+    {
+        $id = $request->user()->id;
+
+        try {
+            $user = User::findOrFail($id);
+            $user->delete();
+            return Helper::jsonData($user);
+        } catch (QueryException $e) {
+            return Helper::jsonNotFound();
+        }
+    }
 }

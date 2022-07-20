@@ -213,12 +213,10 @@
                     <x-td>Manage Users</x-td>
                     <x-blank />
                 </tr>
-            </x-table>
-            <x-alert type="info">Table Below is a API Scheme that not yet ready.</x-alert>
-            <x-table addon="Purpose Diff">
                 <tr>
                     <x-method type="delete" />
                     <x-route>/api/user</x-route>
+                    <x-blank />
                     <x-blank />
                     <x-td>
                         Alike to <x-code>/api/users/{id}</x-code>. But instead of deleting user based on given id, this
