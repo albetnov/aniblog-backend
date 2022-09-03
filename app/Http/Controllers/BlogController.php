@@ -33,7 +33,7 @@ class BlogController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => ['required'],
             'content' => ['required'],
-            'categories' => ['required']
+            'categories' => ['required', 'array']
         ]);
 
 
@@ -48,7 +48,7 @@ class BlogController extends Controller
                     'content' => $request->content,
                     'posted_by' => $request->user()->id
                 ]);
-                $categories = Helper::parseArrayString($request->categories);
+                $categories = $request->categories;
                 Category::findOrFail($categories)->each(function ($category) use ($blog) {
                     $blog->categories()->attach($category);
                 });
@@ -87,7 +87,7 @@ class BlogController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => ['required'],
             'content' => ['required'],
-            'categories' => ['required']
+            'categories' => ['required', 'array']
         ]);
 
         if ($validator->fails()) {
@@ -100,7 +100,7 @@ class BlogController extends Controller
             return DB::transaction(function () use ($request, $id) {
                 $blog = Blog::with('categories')->findOrFail($id);
                 $blog->update($request->except('categories'));
-                $categories = Helper::parseArrayString($request->categories);
+                $categories = $request->categories;
                 $blog->categories()->sync($categories);
                 return Helper::jsonData($blog);
             });

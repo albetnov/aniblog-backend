@@ -88,7 +88,7 @@ it("failed update the blog (not found)", function () {
     $this->putJson("/api/blogs/{$noBlog}", [
         'title' => 'Blog',
         'content' => 'Blog content',
-        'categories' => '1,2,3'
+        'categories' => [1, 2, 3]
     ])->assertNotFound();
 });
 

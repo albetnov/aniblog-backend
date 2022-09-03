@@ -31,7 +31,7 @@ class RoleController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'regex:/^\S*$/u', 'unique:roles,name'],
-            'permissions' => ['required']
+            'permissions' => ['required', 'array']
         ]);
 
         if ($validator->fails()) {
@@ -40,7 +40,7 @@ class RoleController extends Controller
 
         try {
             $role = Role::create(['name' => Str::lower($request->name), 'guard_name' => 'web']);
-            $permissions = Helper::parseArrayString($request->permissions);
+            $permissions = $request->permissions;
             $role->syncPermissions($permissions);
             return Helper::jsonData($role, 201);
         } catch (QueryException $e) {
@@ -75,7 +75,7 @@ class RoleController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'regex:/^\S*$/u', 'unique:roles,name,' . $id],
-            'permissions' => ['required']
+            'permissions' => ['required', 'array']
         ]);
 
         if ($validator->fails()) {
@@ -85,7 +85,7 @@ class RoleController extends Controller
         try {
             $role = Role::findOrFail($id);
             $role->update(['name' => Str::lower($request->name)]);
-            $permissions = Helper::parseArrayString($request->permissions);
+            $permissions = $request->permissions;
             $role->syncPermissions($permissions);
             return Helper::jsonData($role);
         } catch (QueryException $e) {

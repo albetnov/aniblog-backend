@@ -9,8 +9,11 @@ class Helper
         return response()->json(['message' => 'An error occurred while processing the request. Please consult backend log.'], 500);
     }
 
-    public static function jsonNotFound()
+    public static function jsonNotFound($customMessage = null)
     {
+        if ($customMessage) {
+            return response()->json(['message' => $customMessage], 404);
+        }
         return response()->json(['message' => 'Data not found'], 404);
     }
 

@@ -4,6 +4,7 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\TokenController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -18,6 +19,10 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+
+Route::post('/mobile/token', [TokenController::class, 'issue']);
+Route::post('/mobile/token/new', [TokenController::class, 'newUser']);
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/user', function (Request $request) {
@@ -48,4 +53,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::apiResource('/users', UserController::class)->except('index')->middleware('permission:manage users');
     Route::apiResource('/roles', RoleController::class)->middleware('permission:manage roles');
     Route::get('/permissions', [PermissionController::class, 'index'])->middleware('permission:manage roles');
+
+    Route::delete("/mobile/token/revoke", [TokenController::class, 'revoke']);
 });

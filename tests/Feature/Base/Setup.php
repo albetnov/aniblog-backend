@@ -11,7 +11,6 @@ use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Permission;
 
 use function Pest\Laravel\seed;
-use function Pest\Laravel\withoutExceptionHandling;
 use function Pest\Laravel\withoutMiddleware;
 
 class Setup
@@ -36,18 +35,12 @@ class Setup
         if ($makeNotFound) {
             $noCategory = Category::orderByDesc('id')->first()->id + 999;
             $random = rand($noCategory, 9999);
-            return "{$noCategory},{$random},{$random}";
+            return [$noCategory, $random, $random];
         }
 
-        $categories = Category::inRandomOrder()->limit(3)->get();
+        $categories = Category::inRandomOrder()->limit(3)->pluck('id')->toArray();
 
-        $lists = "";
-
-        foreach ($categories as $category) {
-            $lists .= "{$category->id},";
-        }
-
-        return rtrim($lists, ",");
+        return $categories;
     }
 
     public static function permissionBuilder($makeNotFound = false)
@@ -55,17 +48,11 @@ class Setup
         if ($makeNotFound) {
             $noPermission = Permission::orderByDesc('id')->first()->id + 999;
             $random = rand($noPermission, 9999);
-            return "{$noPermission},{$random},{$random}";
+            return [$noPermission, $random, $random];
         }
 
-        $permissions = Permission::inRandomOrder()->limit(2)->get();
+        $permissions = Permission::inRandomOrder()->limit(2)->pluck('id')->toArray();
 
-        $lists = "";
-
-        foreach ($permissions as $permission) {
-            $lists .= "{$permission->id},";
-        }
-
-        return rtrim($lists, ",");
+        return $permissions;
     }
 }

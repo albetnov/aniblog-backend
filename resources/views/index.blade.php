@@ -116,7 +116,7 @@
                 <tr>
                     <x-method type="post" />
                     <x-route>/api/blogs</x-route>
-                    <x-json :data="['title', 'content', 'categories']" />
+                    <x-json :data="['title', 'content', 'categories[]']" />
                     <x-td>
                         Create Blog
                     </x-td>
@@ -124,7 +124,7 @@
                 <tr>
                     <x-method type="put" />
                     <x-route>/api/blogs/{id}</x-route>
-                    <x-json :data="['title', 'content', 'categories']" />
+                    <x-json :data="['title', 'content', 'categories[]']" />
                     <x-td>
                         Update Blog
                     </x-td>
@@ -134,6 +134,31 @@
                     <x-route>/api/blogs/{id}</x-route>
                     <x-blank />
                     <x-td>Delete Blog</x-td>
+                </tr>
+            </x-table>
+        </x-card>
+        <x-card title="Mobile">
+            <x-table :addon="['Authentication', 'Purpose']">
+                <tr>
+                    <x-method type="post" />
+                    <x-route>/api/mobile/token</x-route>
+                    <x-json :data="['email', 'password', 'device_name']" />
+                    <x-td>No</x-td>
+                    <x-td>Issue a token</x-td>
+                </tr>
+                <tr>
+                    <x-method type="delete" />
+                    <x-route>/api/mobile/token/revoke</x-route>
+                    <x-blank />
+                    <x-td>Yes</x-td>
+                    <x-td>Revoking a token</x-td>
+                </tr>
+                <tr>
+                    <x-method type="post" />
+                    <x-route>/api/mobile/token/new</x-route>
+                    <x-json :data="['email', 'name', 'password', 'password_confirmation', 'device_name']" />
+                    <x-td>No</x-td>
+                    <x-td>Create a new user. But with token</x-td>
                 </tr>
             </x-table>
         </x-card>
@@ -246,12 +271,12 @@
                 <tr>
                     <x-method type="post" />
                     <x-route>/api/roles</x-route>
-                    <x-json :data="['name, permissions']" />
+                    <x-json :data="['name, permissions[]']" />
                 </tr>
                 <tr>
                     <x-method type="put" />
                     <x-route>/api/roles/{id}</x-route>
-                    <x-json :data="['name, permissions']" />
+                    <x-json :data="['name, permissions[]']" />
                 </tr>
                 <tr>
                     <x-method type="delete" />
@@ -270,14 +295,6 @@
                         Manage Roles
                     </x-td>
                     <x-td>Show All Permission Data</x-td>
-                </tr>
-                <tr>
-                    <x-method type="get" />
-                    <x-route>/api/user/token</x-route>
-                    <x-td>Logged in User</x-td>
-                    <x-blank />
-                    <x-td>Show current user token. <x-alert type="warning">Currently Work In Progress</x-alert>
-                    </x-td>
                 </tr>
             </x-table>
         </x-card>
