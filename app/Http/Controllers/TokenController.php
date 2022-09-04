@@ -62,4 +62,38 @@ class TokenController extends Controller
 
         return Helper::jsonData(['message' => 'Registered successfully.', 'user' => $user, 'token' => $user->createToken($request->device_name)->plainTextToken]);
     }
+
+    public function editUser(Request $request)
+    {
+        $userId = $request->user()->id;
+
+        $rules = [
+            'email' => ['required', 'email', 'unique:users,email,' . $userId],
+            'name' => 'required',
+        ];
+
+        $data = [
+            'email' => $request->email,
+            'name' => $request->name,
+        ];
+
+        if ($request->password) {
+            $rules['password'] = ['required', 'min:8', 'confirmed'];
+            $data['password'] = bcrypt($request->password);
+        }
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return Helper::jsonValidation($validator);
+        }
+
+        $user = User::where('id', $userId)->update($data);
+
+        if (!$user) {
+            return Helper::errorJson();
+        }
+
+        return Helper::jsonData(['message' => "Updated successfully!"]);
+    }
 }

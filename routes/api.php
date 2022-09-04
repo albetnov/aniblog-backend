@@ -54,5 +54,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::apiResource('/roles', RoleController::class)->middleware('permission:manage roles');
     Route::get('/permissions', [PermissionController::class, 'index'])->middleware('permission:manage roles');
 
+    Route::put('/mobile/token/edit', [TokenController::class, 'editUser']);
     Route::delete("/mobile/token/revoke", [TokenController::class, 'revoke']);
 });

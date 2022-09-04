@@ -69,3 +69,44 @@ it("Failed register a new user (Validation error)", function () {
         'email' => 'test@mail.com'
     ])->assertUnprocessable();
 });
+
+it("Update current user successfully", function () {
+    Sanctum::actingAs(User::where('email', 'admin@mail.com')->first());
+
+    $this->putJson("/api/mobile/token/edit", [
+        'email' => 'testupdate@mail.com',
+        'name' => 'testupdate',
+        'password' => 'test12345',
+        'password_confirmation' => 'test12345'
+    ])->assertOk()->assertJson(fn (AssertableJson $json) => $json->has('message')->etc());
+});
+
+it("Update current user failed (required field not fulfilled)", function () {
+    Sanctum::actingAs(User::where('email', 'admin@mail.com')->first());
+
+    $this->putJson("/api/mobile/token/edit", [
+        'name' => 'hello'
+    ])->assertUnprocessable();
+});
+
+it("Update current user failed (email taken)", function () {
+    Sanctum::actingAs(User::where('email', 'admin@mail.com')->first());
+
+    $this->putJson("/api/mobile/token/edit", [
+        'name' => 'test',
+        'email' => 'asep@mail.com',
+        'password' => 'test12345',
+        'password_confirmation' => 'test12345'
+    ])->assertUnprocessable();
+});
+
+it("Update current user failed (password mismatch)", function () {
+    Sanctum::actingAs(User::where('email', 'admin@mail.com')->first());
+
+    $this->putJson("/api/mobile/token/edit", [
+        'name' => 'test',
+        'email' => 'newmail@mail.com',
+        'password' => 'test12345',
+        'password_confirmation' => 'test123456'
+    ])->assertUnprocessable();
+});
